@@ -3,17 +3,17 @@
 
 /*
  *
- *设备目前使用QEMU模拟，相关参数
- *QEMU RISC-V Virt machine with 16550a UART and VirtIO MMIO
- *
+ * 设备目前使用QEMU模拟，相关参数
+ * QEMU RISC-V Virt machine with 16550a UART and VirtIO MMIO
+ * 
  */
 
 /*
  *
- *maximum number of CPUs
+ * maximum number of CPUs
  * see https://github.com/qemu/qemu/blob/master/include/hw/riscv/virt.h
  * #define VIRT_CPUS_MAX 8
- *
+ * 
  */
 #define MAXNUM_CPU 8
 
