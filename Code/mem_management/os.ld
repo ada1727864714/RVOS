@@ -1,6 +1,6 @@
 /*
- *rvos.ld
- *Linker script for outputing to RVOS
+ * rvos.ld
+ * Linker script for outputing to RVOS
  */
 
 /*

@@ -4,6 +4,10 @@
  * ref: https://github.com/cccriscv/mini-riscv-os/blob/master/05-Preemptive/lib.c
  */
 
+/* 
+ * 大体的实现方式就是维持一个out数组，对每种"%"类型进行判定，制定相应的输出策略
+ * 最后通过uart输出
+ */
 static int _vsnprintf(char * out, size_t n, const char* s, va_list vl)
 {
 	int format = 0;
@@ -109,11 +113,16 @@ static char out_buf[1000]; // buffer for _vprintf()
 
 static int _vprintf(const char* s, va_list vl)
 {
+	/* 
+	 * 首先第一步遍历一遍计算整体的输出长度，
+	 * 如果超过out_buf的限制则无法打印（目前设的是1000字节） 
+	 */
 	int res = _vsnprintf(NULL, -1, s, vl);
 	if (res+1 >= sizeof(out_buf)) {
 		uart_puts("error: output string size overflow\n");
 		while(1) {}
 	}
+	/* 将输出字符存入out_buf，然后调用uart打印 */
 	_vsnprintf(out_buf, res + 1, s, vl);
 	uart_puts(out_buf);
 	return res;
@@ -122,10 +131,22 @@ static int _vprintf(const char* s, va_list vl)
 int printf(const char* s, ...)
 {
 	int res = 0;
+	/* 
+	 * 可变参数列表相关用法参考：
+	 * https://www.runoob.com/cprogramming/c-standard-library-stdarg-h.html
+	 * 简单一点介绍：
+	 * 数据类型（Types）：va_list	用来保存宏 va_arg 与宏 va_end 所需信息。
+     * 宏函数（Macro functions）：
+	 * va_start	初始化一个可变参数列表
+	 * va_arg	获取下一个参数
+	 * va_end	结束使用可变参数列表
+	 * va_copy (C++ 11 only)	复制一个可变参数列表
+	 */
 	va_list vl;
 	va_start(vl, s);
 	res = _vprintf(s, vl);
 	va_end(vl);
+	/* 返回值为打印的字节数 */
 	return res;
 }
 
