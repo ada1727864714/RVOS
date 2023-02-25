@@ -36,5 +36,5 @@ park:
 stacks:
     .skip   STACK_SIZE*MAXNUM_CPU #为所有hart分配空间
 
-    ._bss_end           #文件截止
+    .end           #文件截止
 
