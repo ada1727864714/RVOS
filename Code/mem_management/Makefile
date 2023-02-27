@@ -8,6 +8,7 @@ SRCS_C = \
 	kernel.c \
 	uart.c \
 	printf.c \
+	malloc.c \
 	page.c \
 
 OBJS = $(SRCS_ASM:.S=.o)

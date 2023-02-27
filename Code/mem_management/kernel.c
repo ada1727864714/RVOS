@@ -6,14 +6,16 @@
 extern void uart_init(void);
 extern void page_init(void);
 extern void page_test(void);
+extern void block_init(void);
+extern void malloc_test(void);
 
 void start_kernel(void){
     uart_init();
     uart_puts("Hello,RVOS!\n");
 
-    page_init();
+    block_init();
 
-    page_test();
+    malloc_test();
 
     while (1){}; //系统在此空转
 }

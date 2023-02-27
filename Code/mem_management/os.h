@@ -27,7 +27,12 @@ extern void uart_puts(char *s);
 extern int printf(const char* s, ...);
 extern void panic(char *s);
 
+/* page级内存管理方法 */
 extern void *page_alloc(int npages);
 extern void page_free(void *p);
+
+/* malloc级内存管理方法 */
+extern void *malloc(size_t size);
+extern void free(void *ptr);
 
 #endif /* __OS_H__ */
