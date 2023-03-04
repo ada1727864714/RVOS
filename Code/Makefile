@@ -8,9 +8,9 @@ SECTIONS = \
 
 .DEFAULT_GOAL := all
 all :
-	@echo "begin compile ALL exercises for assembly samples ......................."
+	@echo "begin compile ALL files for assembly samples ......................."
 	for dir in $(SECTIONS); do $(MAKE) -C $$dir || exit "$$?"; done
-	@echo "compile ALL exercises finished successfully! ......"
+	@echo "compile ALL files finished successfully! ......"
 
 .PHONY : clean
 clean:
