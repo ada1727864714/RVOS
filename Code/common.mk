@@ -8,3 +8,11 @@ GDB = gdb-multiarch
 CC = ${CROSS_COMPILE}gcc
 OBJCOPY = ${CROSS_COMPILE}objcopy
 OBJDUMP = ${CROSS_COMPILE}objdump
+
+TOP_DIR := $(PWD)
+
+OBJ_DIR := $(TOP_DIR)/obj
+
+BIN_DIR := $(TOP_DIR)/bin
+
+OUT_PUT := $(TOP_DIR)/bin

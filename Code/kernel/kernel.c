@@ -1,4 +1,4 @@
-#include "os.h"
+#include "../include/os.h"
 
 /*
  * 下面的两个函数只调用一次，所以仅在此声明不包含在 os.h中

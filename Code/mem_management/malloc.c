@@ -1,4 +1,4 @@
-#include "os.h"
+#include "../include/os.h"
 
 /*
  * 下列全局变量定义在mem.S中
