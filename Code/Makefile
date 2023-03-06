@@ -4,6 +4,7 @@ SECTIONS = \
 	io \
 	kernel \
 	mem_management \
+	task_schedule \
 	obj \
 
 .DEFAULT_GOAL := all
