@@ -1,7 +1,22 @@
 #ifndef __TASK_SCHEDULE_H__
 #define __TASK_SCHEDULE_H__
 
-#include "../include/types.h"
+#include "../include/os.h"
+#include <stddef.h> 
+
+/* 该函数定义在 entry.S */
+extern void switch_to(struct context *next);
+
+/* 定义优先级等级上限 */
+#define Priority_num 10
+/* 定义任务栈大小 */
+#define STACK_SIZE 1024
+
+/* task_num：保存当前系统中的任务总数 */
+extern int task_num;
+
+extern void exit();
+extern void schedule();
 
 /* task management */
 struct context {

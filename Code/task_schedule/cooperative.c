@@ -1,66 +1,180 @@
 #include "task_schedule.h"
 
-/* 该函数定义在 entry.S */
-extern void switch_to(struct context *next);
+/* 定义每一个任务的结构体 */
+struct Task
+{
+	uint8_t task_stack[STACK_SIZE];
+	uint8_t priority;
+	struct context ctx_tasks;
+	struct Task *front;
+	struct Task *next;
+};
 
-/* 定义任务上限 */
-#define MAX_TASKS 10
-#define STACK_SIZE 1024
 
-/* 定义任务栈和各任务上下文 */
-uint8_t task_stack[MAX_TASKS][STACK_SIZE];
-struct context ctx_tasks[MAX_TASKS];
+/* 定义schedule函数自己的上下文和栈空间 */
+struct context schedule_context;
+uint8_t schedule_stack[STACK_SIZE];
+
+/* 定义exit函数自己的上下文和栈空间 */
+struct context exit_context;
+uint8_t exit_stack[STACK_SIZE];
+
+/* 定义管理任务的优先级数组 */
+struct Task task_priority_array[Priority_num];
 
 /*
- * _top：用于标记ctx_tasks的最大可用位置
- * _current：用于指向当前任务的上下文
+ * now_priority：指定当前的任务优先级
+ * now_task：指向当前任务的结构体
  */
-static int _top = 0;
-static int _current = -1;
+static uint8_t now_priority; 
+static struct Task *now_task;
+
+/* task_num：保存当前系统中的任务总数 */
+int task_num = 0;
+
 
 /* 写mscratch寄存器 */
 static void w_mscratch(reg_t x){
     asm volatile("csrw mscratch,%0": : "r" (x));
 }
 
+/* schedule初始化 */
 void sched_init(){
+    /* 设置mscratch寄存器初值 */
     w_mscratch(0);
+    /* 初始化任务优先级数组 */
+    for(int i = 0;i < Priority_num;i++){
+        task_priority_array[i].next = NULL;
+    }
+    
+    /* 设置schedule函数的上下文 */
+    schedule_context.sp = &schedule_stack[STACK_SIZE - 1];
+    schedule_context.ra = &schedule;
+
+    /* 设置schedule函数的上下文 */
+    exit_context.sp = &exit_stack[STACK_SIZE - 1];
+    exit_context.ra = &exit;
+
+    /* 初始化now_priority和now_task指针 */
+    now_priority = 0;
+    now_task = NULL;
+}
+
+void task_schedule(){
+    switch_to(&schedule_context);
 }
 
 /*
- * 实现一个简单的循环FIFO调度
+ * 实现任务调度
  */
 void schedule(){
-    if(_top <= 0){
-        panic("Num of task should be greater than zero!");
+    /* 获取当前正在执行的任务 */  
+    struct Task *task = now_task;
+    /* 指向当前任务数字里最高优先级的第一个任务 */
+    struct Task *first_task = NULL;
+
+    /* 获取第一个任务 */
+    for(int i = 0;i < Priority_num;i++){
+        if(task_priority_array[i].next != NULL){
+            first_task = task_priority_array[i].next;
+            break;
+        }
+    }
+    /* 若无任务，则退出schedule */
+    if(first_task == NULL){
+        panic("No task to schedule!\n");
         return;
     }
-
-    /* 使用%操作实现一个循环 */
-    _current = (_current + 1) % _top;
-
-    /* 切换上下文 */
-    struct context *next = &(ctx_tasks[_current]);
-    switch_to(next);
+    /* 如果当前任务被删除或第一次调度，则调度搜索到的第一个任务 */
+    if(task == NULL){
+        now_task = first_task;
+        struct context *next = &now_task->ctx_tasks; 
+        switch_to(next);
+    }else{
+        /* 如果当前最高优先级和当前任务的优先级一样，在此任务链表中循环 */
+        if(first_task->priority == now_priority){
+            now_task = task->next;
+            struct context *next = &now_task->ctx_tasks; 
+            switch_to(next);
+        }else{
+            /* 否则执行当前最高优先级的任务队列 */
+            now_task = first_task;
+            struct context *next = &now_task->ctx_tasks; 
+            switch_to(next);
+        }
+    }    
 }
 
 /* 
  * 描述：
  * 创建一个任务
- * - start_routin：任务例程进入点
+ * - task：任务例程进入点
  * 返回值：
  * 0：创建成功
  * -1：有错误发生
  */
-int task_create(void (*start_routin)(void)){
-    if(_top < MAX_TASKS){
-        ctx_tasks[_top].sp = (reg_t) &task_stack[_top][STACK_SIZE-1];
-        ctx_tasks[_top].ra = (reg_t) start_routin;
-        _top++;
+
+int task_create(void (*task)(void* param),void* param,uint8_t priority){
+    /* 首先保证任务的优先级不高于或等于当前系统的优先级数量 */
+    if(priority < Priority_num){
+        /* 如果当前优先级的链表为空，则创建该优先级的第一个任务 */
+        if(task_priority_array[priority].next == NULL){
+            struct Task *new_task = (struct Task*)malloc(sizeof(struct Task));
+            new_task->ctx_tasks.sp = (reg_t) &new_task->task_stack[STACK_SIZE-1];
+            new_task->ctx_tasks.ra = (reg_t) task;
+            new_task->ctx_tasks.a0 = (reg_t) param;
+            new_task->priority = priority;
+            new_task->next = new_task;
+            new_task->front = new_task;
+            task_priority_array[priority].next = new_task;
+            task_num++;
+        }else{
+            struct Task *first_task = task_priority_array[priority].next;
+            struct Task *new_task = (struct Task*)malloc(sizeof(struct Task));
+            new_task->ctx_tasks.sp = (reg_t) &new_task->task_stack[STACK_SIZE-1];
+            new_task->ctx_tasks.ra = (reg_t) task;
+            new_task->ctx_tasks.a0 = (reg_t) param;
+            new_task->priority = priority;
+            new_task->front = first_task->front;
+            first_task->front->next = new_task;
+            new_task->next = first_task;
+            first_task->front = new_task;
+            task_priority_array[priority].next = new_task;
+            task_num++;
+        }
         return 0;
     }else{
         return -1;
     }
+}
+
+void task_exit(){
+    switch_to(&exit_context);
+}
+
+void exit(){
+    struct Task *task = now_task;
+
+    if(task->next == task){
+        task_priority_array[task->priority].next = NULL;
+        free(task);
+        now_task = NULL;
+        task_num--;
+        switch_to(&schedule_context);
+        printf("test111111111\n");
+        return;
+    }
+    if(task_priority_array[task->priority].next == task){
+        task_priority_array[task->priority].next = task->next;
+    }
+    task->front->next = task->next;
+    task->next->front = task->front;
+    free(task);
+    now_task = NULL;
+    task_num--;
+    switch_to(&schedule_context);
+    printf("test111111111\n");
+    return;
 }
 
 /*
@@ -68,7 +182,7 @@ int task_create(void (*start_routin)(void)){
  * 调用任务放弃CPU，一个新任务开始运行
  */
 void task_yield(){
-    schedule();
+    switch_to(&schedule_context);
 }
 
 /*

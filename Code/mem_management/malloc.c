@@ -117,7 +117,11 @@ void free(void *ptr){
         uint32_t new_block_size = block->size_flag >> 1;
         printf("block = 0x%x, block->next = 0x%x, new_block_size = %d\n", block, block->next, new_block_size);
     }
-    if(_is_free(front_block)){
+    if(front_block == NULL){
+        _free_flag(block);
+        printf("\n");
+        return;
+    }else if(_is_free(front_block)){
         front_block->next = block->next;
         uint32_t block_size = (block->size_flag >> 1);
         uint32_t front_block_size = (front_block->size_flag >> 1);

@@ -9,13 +9,13 @@ void start_kernel(void){
     malloc_test();
 */
 
-    page_init();
+    malloc_init();
 
 	sched_init();
 
 	os_main();
 
-	schedule();
+	task_schedule();
 
 	uart_puts("Would not go here!\n");
     while (1){}; //系统在此空转

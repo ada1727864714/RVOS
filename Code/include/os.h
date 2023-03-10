@@ -34,19 +34,15 @@ extern void page_test(void);
 extern void *page_alloc(int npages);
 extern void page_free(void *p);
 
-/* malloc级内存管理方法 */
-extern void malloc_init(void);
-extern void malloc_test(void);
-extern void *malloc(size_t size);
-extern void free(void *ptr);
 
 /* 协作式任务调度 */
-extern int  task_create(void (*task)(void));
+extern int  task_create(void (*task)(void* param),void* param,uint8_t priority);
 extern void task_delay(volatile int count);
 extern void task_yield();
+extern void task_exit();
 
 extern void os_main(void);
 extern void sched_init(void);
-extern void schedule(void);
+extern void task_schedule(void);
 
 #endif /* __OS_H__ */
