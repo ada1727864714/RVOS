@@ -10,6 +10,7 @@ SECTIONS = \
 .DEFAULT_GOAL := all
 all :
 	@echo "begin compile ALL files for assembly samples ......................."
+	$(shell mkdir -p $(TOP_DIR)/bin)
 	for dir in $(SECTIONS); do $(MAKE) -C $$dir || exit "$$?"; done
 	@echo "compile ALL files finished successfully! ......"
 
@@ -37,5 +38,5 @@ code: $(OUT_PUT)/os.elf
 
 .PHONY : clean
 clean:
-	rm -rf $(OBJ_DIR)/*.o $(OUT_PUT)/*.bin $(OUT_PUT)/*.elf
+	rm -rf $(OBJ_DIR)/*.o $(OUT_PUT)
 

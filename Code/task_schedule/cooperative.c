@@ -61,6 +61,14 @@ void sched_init(){
 }
 
 /*
+ * 描述：
+ * 作为系统调用的接口，调用任务放弃CPU，一个新任务开始运行
+ */
+void task_yield(){
+    switch_to(&schedule_context);
+}
+
+/*
  * 实现任务调度
  */
 void schedule(){
@@ -109,7 +117,6 @@ void schedule(){
  * 0：创建成功
  * -1：有错误发生
  */
-
 int task_create(void (*task)(void* param),void* param,uint8_t priority){
     /* 首先保证任务的优先级不高于或等于当前系统的优先级数量 */
     if(priority < Priority_num){
@@ -144,13 +151,14 @@ int task_create(void (*task)(void* param),void* param,uint8_t priority){
     }
 }
 
+/* 提供函数退出接口 */
 void task_exit(){
     switch_to(&exit_context);
 }
 
 void exit(){
     struct Task *task = now_task;
-
+    /* 如果当前链表上只有一个任务，直接清空当前优先级，同时返回 */
     if(task->next == task){
         task_priority_array[task->priority].next = NULL;
         free(task);
@@ -159,6 +167,7 @@ void exit(){
         switch_to(&schedule_context);
         return;
     }
+    /* 如果该任务是当前优先级的进入节点，则切换当前优先级进入节点 */
     if(task_priority_array[task->priority].next == task){
         task_priority_array[task->priority].next = task->next;
     }
@@ -169,14 +178,6 @@ void exit(){
     task_num--;
     switch_to(&schedule_context);
     return;
-}
-
-/*
- * 描述：
- * 调用任务放弃CPU，一个新任务开始运行
- */
-void task_yield(){
-    switch_to(&schedule_context);
 }
 
 /*
