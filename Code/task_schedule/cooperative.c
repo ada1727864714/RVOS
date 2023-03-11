@@ -60,10 +60,6 @@ void sched_init(){
     now_task = NULL;
 }
 
-void task_schedule(){
-    switch_to(&schedule_context);
-}
-
 /*
  * 实现任务调度
  */
@@ -161,7 +157,6 @@ void exit(){
         now_task = NULL;
         task_num--;
         switch_to(&schedule_context);
-        printf("test111111111\n");
         return;
     }
     if(task_priority_array[task->priority].next == task){
@@ -173,7 +168,6 @@ void exit(){
     now_task = NULL;
     task_num--;
     switch_to(&schedule_context);
-    printf("test111111111\n");
     return;
 }
 

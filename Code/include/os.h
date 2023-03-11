@@ -43,6 +43,5 @@ extern void task_exit();
 
 extern void os_main(void);
 extern void sched_init(void);
-extern void task_schedule(void);
 
 #endif /* __OS_H__ */

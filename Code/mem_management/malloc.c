@@ -107,6 +107,13 @@ void free(void *ptr){
     /* 首先查看后一块内存是否空闲，空闲即合并，再查看前一块 */
     if(_is_free(next_block)){
         block->next = next_block->next;
+
+        /* 如果下一个空闲块不为空，则需将其的前向指针指向前一个块 */
+        if(block->next != NULL){
+            struct Block *next_next_block = next_block->next;
+            next_next_block->front = block;
+        }
+
         uint32_t block_size = (block->size_flag >> 1);
         uint32_t next_block_size = (next_block->size_flag >> 1);
         printf("block_size: %d ,next_block_size: %d\n",block_size,next_block_size);
@@ -123,6 +130,13 @@ void free(void *ptr){
         return;
     }else if(_is_free(front_block)){
         front_block->next = block->next;
+
+        /* 如果下一个空闲块不为空，则需将其的前向指针指向前一个块 */
+        if(block->next != NULL){
+            struct Block *next_next_block = block->next;
+            next_next_block->front = front_block;
+        }
+
         uint32_t block_size = (block->size_flag >> 1);
         uint32_t front_block_size = (front_block->size_flag >> 1);
         printf("front_block_size: %d ,block_size: %d\n",front_block_size,block_size);
