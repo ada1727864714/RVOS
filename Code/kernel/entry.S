@@ -85,6 +85,38 @@
 
 .text
 
+# 机器模式下的中断和异常出现在这里
+.globl trap_vector
+# trap向量基址必须始终在4字节边界上对齐
+.align 4
+trap_vector:
+	# 保存当前上下文
+	csrrw   t6,mscratch,t6    # 交换t6和mscratch的值
+    reg_save t6             # 保存前一任务的上下文
+
+    # 保存实际的t6寄存器
+    mv  t5,t6        # t5指向当前任务的上下文
+    csrr    t6,mscratch     # 获取t6的实际值
+    sw  t6, 120(t5)     # 将t6的值保存在正确的位置（我们定义的是上下文偏移120）
+
+	# 将上下文指针恢复到 mscratch
+	csrw	mscratch, t5
+
+	# 调用在trap.c中的trap处理函数
+	csrr	a0, mepc
+	csrr	a1,	mcause
+	call	trap_handler
+
+	# trap_handler会通过a0返回返回地址
+	csrw	mepc, a0
+
+	# 恢复上下文
+	csrr	t6, mscratch
+	reg_restore t6
+
+	# 回到trap之前做的事情
+	mret
+
 # void switch_to(struct context *next);
 # a0：指向下一个任务的上下文的指针
 .globl switch_to
