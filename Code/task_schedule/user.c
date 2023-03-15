@@ -8,6 +8,7 @@ void user_task0(void)
 	int i = 0;
 	while (i < 5) {
 		uart_puts("Task 0: Running...\n");
+		trap_test();
 		i++;
 		task_delay(DELAY);
 		task_yield();

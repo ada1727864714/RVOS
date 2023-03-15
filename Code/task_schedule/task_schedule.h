@@ -3,6 +3,7 @@
 
 #include "../include/os.h"
 #include <stddef.h> 
+#include "../include/riscv.h"
 
 /* 该函数定义在 entry.S */
 extern void switch_to(struct context *next);

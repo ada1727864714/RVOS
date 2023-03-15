@@ -32,12 +32,6 @@ static struct Task *now_task;
 /* task_num：保存当前系统中的任务总数 */
 int task_num = 0;
 
-
-/* 写mscratch寄存器 */
-static void w_mscratch(reg_t x){
-    asm volatile("csrw mscratch,%0": : "r" (x));
-}
-
 /* schedule初始化 */
 void sched_init(){
     /* 设置mscratch寄存器初值 */

@@ -13,10 +13,11 @@ void start_kernel(void){
 
 	sched_init();
 
+    trap_init();
+
 	os_main();
 
 	task_yield();
-
 	uart_puts("Would not go here!\n");
     while (1){}; //系统在此空转
 }

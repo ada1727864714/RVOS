@@ -7,6 +7,7 @@
 
 #include "types.h"
 #include "platform.h"
+#include "riscv.h"
 
 /*
  * stddef.h 头文件定义了各种变量类型和宏，如size_t,NULL等
@@ -43,5 +44,10 @@ extern void task_exit();
 
 extern void os_main(void);
 extern void sched_init(void);
+
+/* 异常处理相关 */
+extern void trap_init();
+extern reg_t trap_handler(reg_t epc, reg_t cause);
+extern void trap_test();
 
 #endif /* __OS_H__ */
