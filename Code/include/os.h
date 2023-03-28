@@ -6,7 +6,7 @@
 #define __OS_H__
 
 #include "types.h"
-#include "platform.h"
+#include "../platform/qemu_virt.h"
 #include "riscv.h"
 
 /*
@@ -22,6 +22,7 @@
 
 /* uart */
 extern void uart_init(void);
+extern void uarths_init(void);
 extern int uart_putc(char ch);
 extern void uart_puts(char *s);
 

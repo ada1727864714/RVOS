@@ -3,16 +3,16 @@
 /*
  * 下列全局变量定义在mem.S中
  */
-extern uint32_t TEXT_START;
-extern uint32_t TEXT_END;
-extern uint32_t DATA_START;
-extern uint32_t DATA_END;
-extern uint32_t RODATA_START;
-extern uint32_t RODATA_END;
-extern uint32_t BSS_START;
-extern uint32_t BSS_END;
-extern uint32_t HEAP_START;
-extern uint32_t HEAP_SIZE;
+extern reg_t TEXT_START;
+extern reg_t TEXT_END;
+extern reg_t DATA_START;
+extern reg_t DATA_END;
+extern reg_t RODATA_START;
+extern reg_t RODATA_END;
+extern reg_t BSS_START;
+extern reg_t BSS_END;
+extern reg_t HEAP_START;
+extern reg_t HEAP_SIZE;
 
 /* 每一页的大小是 4KB 即 4096B */
 #define PAGE_SIZE 4096
@@ -75,8 +75,8 @@ static inline int _is_last(struct Page *page)
  * address加上order，即4KB下的偏移量移到下一页，
  * 然后 & 0x000清空低12位确定地址
  */
-static inline uint32_t _align_page(uint32_t address)
+static inline reg_t _align_page(reg_t address)
 {
-    uint32_t order = (1 << PAGE_ORDER) - 1;
+    reg_t order = (1 << PAGE_ORDER) - 1;
     return (address + order) & (~order);
 }

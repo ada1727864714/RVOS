@@ -3,17 +3,18 @@
 void start_kernel(void){
     uart_init();
     uart_puts("Hello,RVOS!\n");
-/*
-    malloc_init();
-
-    malloc_test();
-*/
-
-    malloc_init();
-
-	sched_init();
 
     trap_init();
+
+    malloc_init();
+    printf("1\n");
+
+    malloc_test();
+
+
+    //malloc_init();
+
+	sched_init();
 
 	os_main();
 

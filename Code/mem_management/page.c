@@ -5,9 +5,9 @@
  * _alloc_end：指向堆池的实际结束地址
  * _num_pages：保存我们可以分配的实际最大页面数
  */
-static uint32_t _alloc_start = 0;
-static uint32_t _alloc_end = 0;
-static uint32_t _num_pages = 0;
+static reg_t _alloc_start = 0;
+static reg_t _alloc_end = 0;
+static reg_t _num_pages = 0;
 
 void page_init(){
     /*
@@ -99,12 +99,12 @@ void page_free(void *p){
     /*
      * Assert (TBD) if p is invalid
      */
-    if(!p || (uint32_t)p >= _alloc_end){
+    if(!p || (reg_t)p >= _alloc_end){
         return;
     }
     /* 获得该内存块的第一页描述符 */
     struct Page *page = (struct Page *)HEAP_START;
-    page += ((uint32_t)p - _alloc_start)/ PAGE_SIZE;
+    page += ((reg_t)p - _alloc_start)/ PAGE_SIZE;
     /* 循环并清除内存块的所有页面描述符 */
     while (!_is_free(page)){
         if(_is_last(page)){

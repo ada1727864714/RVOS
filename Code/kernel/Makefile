@@ -1,5 +1,5 @@
 include ../common.mk
-INCLUDE_DIR := ../include ../
+INCLUDE_DIR := ../include ../platform
 DIR := -I$(INCLUDE_DIR)
 
 SRCS_S = $(wildcard *.S)

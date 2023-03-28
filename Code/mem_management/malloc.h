@@ -1,24 +1,27 @@
+#ifndef __MALLOC_H__
+#define __MALLOC_H__
+
 #include "../include/os.h"
 
 /*
  * 下列全局变量定义在mem.S中
  */
-extern uint32_t TEXT_START;
-extern uint32_t TEXT_END;
-extern uint32_t DATA_START;
-extern uint32_t DATA_END;
-extern uint32_t RODATA_START;
-extern uint32_t RODATA_END;
-extern uint32_t BSS_START;
-extern uint32_t BSS_END;
-extern uint32_t HEAP_START;
-extern uint32_t HEAP_SIZE;
+extern reg_t TEXT_START;
+extern reg_t TEXT_END;
+extern reg_t DATA_START;
+extern reg_t DATA_END;
+extern reg_t RODATA_START;
+extern reg_t RODATA_END;
+extern reg_t BSS_START;
+extern reg_t BSS_END;
+extern reg_t HEAP_START;
+extern reg_t HEAP_SIZE;
 
 /* 定义链表头大小 */
-#define block_head 12
+#define block_head 24
 
 /* 块头最后一个字节表示占用情况，为 1 占用 */
-#define BLOCK_TAKEN (uint32_t)(1 << 0)
+#define BLOCK_TAKEN (reg_t)(1 << 0)
 
 /*
  * Block描述：
@@ -29,9 +32,9 @@ extern uint32_t HEAP_SIZE;
  * 其余位记录该块大小
  */
 struct Block{
-    uint32_t *front;
-    uint32_t *next;
-    uint32_t size_flag; 
+    reg_t *front;
+    reg_t *next;
+    reg_t size_flag; 
 };
 
 /* 清空块头 */
@@ -63,10 +66,10 @@ static inline void _free_flag(struct Block *block){
 }
 
 /* 设置块大小 */
-static inline void _set_size(struct Block *block, uint32_t size)
+static inline void _set_size(struct Block *block, reg_t size)
 {
-    uint32_t flag = _is_free(block);
-    uint32_t tmp = size << 1;
+    reg_t flag = _is_free(block);
+    reg_t tmp = size << 1;
     block->size_flag = tmp;
     if(flag){
         _free_flag(block);
@@ -74,3 +77,5 @@ static inline void _set_size(struct Block *block, uint32_t size)
         _set_flag(block);
     }
 }
+
+#endif

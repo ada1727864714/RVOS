@@ -1,14 +1,15 @@
 #include "../include/os.h"
 
-/*
- * The UART control registers are memory-mapped at address UART0. 
- * This macro returns the address of one of the registers.
+/* 
+ * UART 控制寄存器在UART0地址上进行内存映射
+ * 这个会返回你需要的寄存器的地址
  */
 #define UART_REG(reg) ((volatile uint8_t *)(UART0 + reg))
 
 /*
  * Reference
  * [1]: TECHNICAL DATA ON 16550, http://byterunner.com/16550.html
+ * 16500技术手册
  */
 
 /*

@@ -1,7 +1,7 @@
-#include "platform.h"
+#include "../platform/qemu_virt.h"
 
     #每个hart的栈大小为 1024 bytes
-    .equ STACK_SIZE,1024
+    .equ STACK_SIZE,4*1024
 
     .global _start
 
@@ -30,11 +30,11 @@ _code_continue:
     j start_kernel      #hart 0跳转到c
 
 park:
-    wfi                 #RISC-V架构定义的一天休眠指令
+    wfi                 #RISC-V架构定义的一条休眠指令
     j park
 
 stacks:
-    .skip   STACK_SIZE*MAXNUM_CPU #为所有hart分配空间
+    .skip   STACK_SIZE #为所有hart分配空间
 
     .end           #文件截止
 

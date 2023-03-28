@@ -45,7 +45,7 @@ void sched_init(){
     schedule_context.sp = &schedule_stack[STACK_SIZE - 1];
     schedule_context.ra = &schedule;
 
-    /* 设置schedule函数的上下文 */
+    /* 设置exit函数的上下文 */
     exit_context.sp = &exit_stack[STACK_SIZE - 1];
     exit_context.ra = &exit;
 
