@@ -1,5 +1,6 @@
+platform = K210
 CROSS_COMPILE = riscv64-unknown-elf-
-CFLAGS = -nostdlib -mcmodel=medany -fno-builtin -march=rv64ima -mabi=lp64 -g -Wall
+CFLAGS = -nostdlib -mcmodel=medany -fno-builtin -march=rv64ima -mabi=lp64 -g -Wall -D$(platform)
 
 QEMU = qemu-system-riscv64
 QFLAGS = -nographic -smp 1 -machine virt -bios none

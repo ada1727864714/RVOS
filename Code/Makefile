@@ -5,6 +5,7 @@ SECTIONS = \
 	kernel \
 	mem_management \
 	task_schedule \
+	platform \
 	trap \
 	obj \
 

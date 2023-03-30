@@ -98,8 +98,10 @@ SECTIONS
 	} >ram
 
 	.rodata : {
+		. = ALIGN(8);
 		PROVIDE(_rodata_start = .);
 		*(.rodata .rodata.*)
+		. = ALIGN(8);
 		PROVIDE(_rodata_end = .);
 	} >ram
 
@@ -109,7 +111,7 @@ SECTIONS
          * 插入填充字节，直到当前位置与4096字节边界对齐为止。因为我们的
          * 分页系统分辨率是4096字节
 		 */
-		. = ALIGN(4096);
+		 . = ALIGN(4096);
 		PROVIDE(_data_start = .);
 		/*
 		 * sdata和data本质上是一样的，我们不需要区分sdata和data 
@@ -124,10 +126,12 @@ SECTIONS
 		 * https://sourceware.org/binutils/docs/ld/Input-Section-Common.html
 		 * 在大多数情况下，输入文件中的常用符号将放在输出文件的 '.bss' 节中 
 		 */
+		. = ALIGN(8);
 		PROVIDE(_bss_start = .);
 		*(.sbss .sbss.*)
 		*(.bss .bss.*)
 		*(COMMON)
+		. = ALIGN(8);
 		PROVIDE(_bss_end = .);
 	} >ram
 

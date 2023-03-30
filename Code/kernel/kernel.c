@@ -5,14 +5,9 @@ void start_kernel(void){
     uart_puts("Hello,RVOS!\n");
 
     trap_init();
-
     malloc_init();
-    printf("1\n");
 
     malloc_test();
-
-
-    //malloc_init();
 
 	sched_init();
 

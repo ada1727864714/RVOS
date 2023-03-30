@@ -40,6 +40,7 @@ reg_t trap_handler(reg_t epc, reg_t cause){
     }else{
         /* 异常处理逻辑 */
         printf("Sync exceptions!, code = %d\n", cause_code);
+        printf("%ld\n",cause);
         panic("OOPS! What can I do!");
     }
 

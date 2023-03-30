@@ -10,27 +10,29 @@ struct Task
 	struct Task *next;
 };
 
-
+/* K210强制要求字节对齐 */
+#pragma pack (8)
 /* 定义schedule函数自己的上下文和栈空间 */
-struct context schedule_context;
-uint8_t schedule_stack[STACK_SIZE];
+struct context   schedule_context;
+uint8_t          schedule_stack[STACK_SIZE];
 
 /* 定义exit函数自己的上下文和栈空间 */
-struct context exit_context;
-uint8_t exit_stack[STACK_SIZE];
+struct context   exit_context;
+uint8_t          exit_stack[STACK_SIZE];
 
 /* 定义管理任务的优先级数组 */
-struct Task task_priority_array[Priority_num];
+struct Task      task_priority_array[Priority_num];
 
 /*
  * now_priority：指定当前的任务优先级
  * now_task：指向当前任务的结构体
  */
-static uint8_t now_priority; 
+static uint8_t   now_priority; 
 static struct Task *now_task;
 
 /* task_num：保存当前系统中的任务总数 */
 int task_num = 0;
+#pragma pack ()
 
 /* schedule初始化 */
 void sched_init(){
@@ -42,11 +44,15 @@ void sched_init(){
     }
     
     /* 设置schedule函数的上下文 */
-    schedule_context.sp = &schedule_stack[STACK_SIZE - 1];
+    /* 栈空间减8满足K210的字节对齐要求 */
     schedule_context.ra = &schedule;
+    schedule_context.sp = &schedule_stack[STACK_SIZE - 8];
+    printf("sp:%lx\n",schedule_context.sp);
+    printf("ra:%lx\n",schedule_context.ra);
+    printf("%lx\n",&schedule_context);
 
     /* 设置exit函数的上下文 */
-    exit_context.sp = &exit_stack[STACK_SIZE - 1];
+    exit_context.sp = &exit_stack[STACK_SIZE - 8];
     exit_context.ra = &exit;
 
     /* 初始化now_priority和now_task指针 */
@@ -66,11 +72,10 @@ void task_yield(){
  * 实现任务调度
  */
 void schedule(){
-    /* 获取当前正在执行的任务 */  
+    /* 获取当前正在执行的任务 */ 
     struct Task *task = now_task;
     /* 指向当前任务数字里最高优先级的第一个任务 */
     struct Task *first_task = NULL;
-
     /* 获取第一个任务 */
     for(int i = 0;i < Priority_num;i++){
         if(task_priority_array[i].next != NULL){
@@ -92,7 +97,7 @@ void schedule(){
         /* 如果当前最高优先级和当前任务的优先级一样，在此任务链表中循环 */
         if(first_task->priority == now_priority){
             now_task = task->next;
-            struct context *next = &now_task->ctx_tasks; 
+            struct context *next = &now_task->ctx_tasks;
             switch_to(next);
         }else{
             /* 否则执行当前最高优先级的任务队列 */
@@ -117,7 +122,7 @@ int task_create(void (*task)(void* param),void* param,uint8_t priority){
         /* 如果当前优先级的链表为空，则创建该优先级的第一个任务 */
         if(task_priority_array[priority].next == NULL){
             struct Task *new_task = (struct Task*)malloc(sizeof(struct Task));
-            new_task->ctx_tasks.sp = (reg_t) &new_task->task_stack[STACK_SIZE-1];
+            new_task->ctx_tasks.sp = (reg_t) &new_task->task_stack[STACK_SIZE-8];
             new_task->ctx_tasks.ra = (reg_t) task;
             new_task->ctx_tasks.a0 = (reg_t) param;
             new_task->priority = priority;
@@ -128,7 +133,7 @@ int task_create(void (*task)(void* param),void* param,uint8_t priority){
         }else{
             struct Task *first_task = task_priority_array[priority].next;
             struct Task *new_task = (struct Task*)malloc(sizeof(struct Task));
-            new_task->ctx_tasks.sp = (reg_t) &new_task->task_stack[STACK_SIZE-1];
+            new_task->ctx_tasks.sp = (reg_t) &new_task->task_stack[STACK_SIZE-8];
             new_task->ctx_tasks.ra = (reg_t) task;
             new_task->ctx_tasks.a0 = (reg_t) param;
             new_task->priority = priority;

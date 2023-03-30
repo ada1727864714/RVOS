@@ -1,4 +1,6 @@
 #include "../include/os.h"
+#include "../platform/K210.h"
+#include "../platform/qemu_virt.h"
 
 /* 
  * UART 控制寄存器在UART0地址上进行内存映射
@@ -69,6 +71,11 @@
 
 void uart_init()
 {
+#ifdef K210
+	sifive_uart_init(K210_UART_BASE_ADDR, k210_get_clk_freq(),
+				K210_UART_BAUDRATE);
+#else
+
 	/* disable interrupts. */
 	uart_write_reg(IER, 0x00);
 
@@ -103,12 +110,21 @@ void uart_init()
 	 */
 	lcr = 0;
 	uart_write_reg(LCR, lcr | (3 << 0));
+#endif
 }
 
 int uart_putc(char ch)
 {
+#ifdef K210
+	while (get_reg(UART_REG_TXFIFO) & UART_TXFIFO_FULL)
+		;
+
+	set_reg(UART_REG_TXFIFO, ch);
+#else
+	
 	while ((uart_read_reg(LSR) & LSR_TX_IDLE) == 0);
 	return uart_write_reg(THR, ch);
+#endif
 }
 
 void uart_puts(char *s)

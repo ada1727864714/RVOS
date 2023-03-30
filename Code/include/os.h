@@ -23,6 +23,7 @@
 /* uart */
 extern void uart_init(void);
 extern void uarths_init(void);
+extern int k210_uart_init();
 extern int uart_putc(char ch);
 extern void uart_puts(char *s);
 

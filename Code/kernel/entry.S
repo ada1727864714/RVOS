@@ -123,10 +123,10 @@ trap_vector:
 .align 8
 switch_to:
     csrrw   t6,mscratch,t6    # 交换t6和mscratch的值
+
     beqz    t6,1f           # 注意：第一次调用switch_to()函数时，
                             # mscratch寄存器被初始化为0（在sched_init()中），
                             # 这使得t6为0，此时直接跳转对mscratch进行初始化
-    
     reg_save t6             # 保存前一任务的上下文
 
     # 保存实际的t6寄存器
@@ -143,8 +143,8 @@ switch_to:
     # 因为如果使用a0那么在加载过程中就会被覆盖掉
     # 而t6是在最后加载
     mv  t6, a0
-    reg_restore t6
 
+    reg_restore t6
 
     ret
 

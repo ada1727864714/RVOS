@@ -1,21 +1,20 @@
 #include "malloc.h"
 
+#pragma pack (8)
 /* _num_sizes */
 static reg_t _num_sizes = 0;
 
 /* 设置一个链表头 */
 static struct Block *first_block = NULL;
+#pragma pack ()
 
 void malloc_init(){
     /* 设置堆内存 */
     _num_sizes = (reg_t)HEAP_SIZE;
-    printf("%ld\n",_num_sizes);
 
     /* 初始化第一个空闲块，该块大小是(HEAP_SIZE - block_head) */
     first_block = (struct Block*)HEAP_START;
 
-    first_block->front = NULL;
-    printf("1\n");
 
     first_block->next = NULL;
     first_block->size_flag = 0;
@@ -24,6 +23,7 @@ void malloc_init(){
 
     /* 更新_num_sizes */
     _num_sizes = _num_sizes - block_head;
+    printf("num_sizes:   %ld\n",_num_sizes);
 
     printf("TEXT:   0x%lx -> 0x%lx\n", TEXT_START, TEXT_END);
 	printf("RODATA: 0x%lx -> 0x%lx\n", RODATA_START, RODATA_END);
@@ -38,6 +38,13 @@ void malloc_init(){
  * - size：要分配的内存块大小
  */
 void *malloc(size_t size){
+
+    /* 为了保证分配的空间都是8字节对齐的，对未满8字节的空间进行补齐 */
+    if (size%8 !=0)
+    {
+        size += (8 - (size%8));    
+    }
+    
 
     struct Block *block = first_block;
 

@@ -31,8 +31,5 @@
  */
 /*当前机器将UART寄存器放在物理内存的此处*/
 #define UART0 0x10000000UL
-// #define UART0 0x38000000L
-
-// #define UARTHS_BASE_ADDR 0x38000000UL
 
 #endif

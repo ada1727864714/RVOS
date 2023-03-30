@@ -1,6 +1,6 @@
 #include "../include/os.h"
 
-#define DELAY 1000
+#define DELAY 100
 
 void user_task0(void)
 {

@@ -5,6 +5,7 @@
  */
 
 .section .rodata
+.align 8
 .global HEAP_START
 HEAP_START: .dword _heap_start
 
