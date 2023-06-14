@@ -7,6 +7,7 @@
 
 #include "types.h"
 #include "../platform/qemu_virt.h"
+#include "../platform/K210.h"
 #include "riscv.h"
 
 /*
@@ -48,7 +49,7 @@ extern void os_main(void);
 extern void sched_init(void);
 
 /* 异常处理相关 */
-extern void trap_init();
+extern void interrupt_vector_init();
 extern reg_t trap_handler(reg_t epc, reg_t cause);
 extern void trap_test();
 

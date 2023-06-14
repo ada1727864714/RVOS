@@ -3,8 +3,9 @@ display/z $sp
 display/z $mepc
 display/z $a5
 display/z $ra
+display/z $mtvec
 
 set disassemble-next-line on
-b task_yield
+b trap_test
 target remote : 1234
 c

@@ -6,7 +6,7 @@ SECTIONS = \
 	mem_management \
 	task_schedule \
 	platform \
-	trap \
+	interrupt_and_trap \
 	obj \
 
 .DEFAULT_GOAL := all

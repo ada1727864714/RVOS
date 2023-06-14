@@ -83,12 +83,48 @@
 #   最底部的寄存器（x31），在加载过程中不会被覆盖。
 # 注意：CSRs（mscratch）不能用作'base'，因为加载/恢复指令只接受通用寄存器
 
+.weak __Machine_external_handler
+.balign 8,0
+.global __Machine_external_handler
+
 .text
 
-# 机器模式下的中断和异常出现在这里
+# 机器模式下的中断出现在这里
+.globl __Machine_external_handler
+# trap向量基址必须始终在8字节边界上对齐
+.align 3
+__Machine_external_handler:
+	# 保存当前上下文
+	csrrw   t6,mscratch,t6    # 交换t6和mscratch的值
+    reg_save t6             # 保存前一任务的上下文
+
+    # 保存实际的t6寄存器
+    mv  t5,t6        # t5指向当前任务的上下文
+    csrr    t6,mscratch     # 获取t6的实际值
+    sd  t6, 240(t5)     # 将t6的值保存在正确的位置（我们定义的是上下文偏移120）
+
+	# 将上下文指针恢复到 mscratch
+	csrw	mscratch, t5
+
+	# 调用在外部中断处理函数
+	csrr	a0, mepc
+	csrr	a1,	mcause
+	call	Machine_external_handler
+
+	# trap_handler会通过a0返回返回地址
+	csrw	mepc, a0
+
+	# 恢复上下文
+	csrr	t6, mscratch
+	reg_restore t6
+
+	# 回到trap之前做的事情
+	mret
+
+# 机器模式下的异常出现在这里
 .globl trap_vector
-# trap向量基址必须始终在4字节边界上对齐
-.align 8
+# trap向量基址必须始终在8字节边界上对齐
+.align 3
 trap_vector:
 	# 保存当前上下文
 	csrrw   t6,mscratch,t6    # 交换t6和mscratch的值
@@ -120,7 +156,7 @@ trap_vector:
 # void switch_to(struct context *next);
 # a0：指向下一个任务的上下文的指针
 .globl switch_to
-.align 8
+.align 3
 switch_to:
     csrrw   t6,mscratch,t6    # 交换t6和mscratch的值
 

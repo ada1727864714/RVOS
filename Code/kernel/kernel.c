@@ -4,12 +4,15 @@ void start_kernel(void){
     uart_init();
     uart_puts("Hello,RVOS!\n");
 
-    trap_init();
+    // page_init();
+    // page_test();
+    sched_init();
+    interrupt_vector_init();
     malloc_init();
 
     malloc_test();
 
-	sched_init();
+	// //sched_init();
 
 	os_main();
 

@@ -20,6 +20,9 @@ uint8_t          schedule_stack[STACK_SIZE];
 struct context   exit_context;
 uint8_t          exit_stack[STACK_SIZE];
 
+/* 定义内核上下文 */
+struct context kernel_context;
+
 /* 定义管理任务的优先级数组 */
 struct Task      task_priority_array[Priority_num];
 
@@ -37,7 +40,7 @@ int task_num = 0;
 /* schedule初始化 */
 void sched_init(){
     /* 设置mscratch寄存器初值 */
-    w_mscratch(0);
+    w_mscratch(&kernel_context);
     /* 初始化任务优先级数组 */
     for(int i = 0;i < Priority_num;i++){
         task_priority_array[i].next = NULL;
@@ -47,10 +50,7 @@ void sched_init(){
     /* 栈空间减8满足K210的字节对齐要求 */
     schedule_context.ra = &schedule;
     schedule_context.sp = &schedule_stack[STACK_SIZE - 8];
-    printf("sp:%lx\n",schedule_context.sp);
-    printf("ra:%lx\n",schedule_context.ra);
-    printf("%lx\n",&schedule_context);
-
+    
     /* 设置exit函数的上下文 */
     exit_context.sp = &exit_stack[STACK_SIZE - 8];
     exit_context.ra = &exit;

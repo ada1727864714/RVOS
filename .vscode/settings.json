@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "stdint.h": "c",
-        "k210.h": "c"
+        "k210.h": "c",
+        "stdarg.h": "c"
     }
 }
